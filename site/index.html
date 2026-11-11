@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Public presentations by Aristoma.">
+  <title>Aristoma Slides</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Serif:wght@500;600&amp;display=swap">
+  <style>
+    :root {
+      --ink: #17221f;
+      --muted: #63706b;
+      --accent: #176c56;
+      --line: #d7dfda;
+      --paper: #f6f8f7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: var(--ink);
+      background: linear-gradient(125deg, #fff 0%, var(--paper) 72%);
+      font-family: "IBM Plex Sans", sans-serif;
+      letter-spacing: 0;
+    }
+    .page { width: min(960px, calc(100% - 48px)); margin: 0 auto; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 32px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .identity { display: flex; align-items: center; gap: 12px; }
+    .identity img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+    .identity strong { font-size: 18px; font-weight: 600; }
+    a { color: var(--accent); text-underline-offset: 4px; }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+    main { padding: 64px 0 80px; }
+    h1 {
+      margin: 0 0 48px;
+      max-width: 100%;
+      font: 600 48px/1.12 "IBM Plex Serif", serif;
+      overflow-wrap: anywhere;
+    }
+    .section-heading { margin: 0; padding-bottom: 16px; border-bottom: 1px solid var(--line); font-size: 20px; font-weight: 500; }
+    .empty { margin: 0; padding: 32px 0; color: var(--muted); font-size: 17px; line-height: 1.6; }
+    footer { padding: 24px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+    @media (max-width: 600px) {
+      .page { width: calc(100% - 32px); }
+      header { padding: 24px 0; gap: 16px; flex-wrap: wrap; }
+      main { padding: 40px 0 64px; }
+      h1 { margin-bottom: 32px; font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="identity">
+        <img src="https://avatars.githubusercontent.com/u/192220157?v=4" width="40" height="40" alt="Aristoma">
+        <strong>Aristoma</strong>
+      </div>
+      <a href="https://github.com/aristo7298sub/public-slides">GitHub</a>
+    </header>
+    <main>
+      <h1>Aristoma Slides</h1>
+      <section aria-labelledby="presentations">
+        <h2 id="presentations" class="section-heading">Presentations</h2>
+        <p class="empty">No presentations published.</p>
+      </section>
+    </main>
+    <footer>Public presentations by Aristoma</footer>
+  </div>
+</body>
+</html>
