@@ -34,6 +34,7 @@ class Page(HTMLParser):
         self.in_title = False
         self.viewport = False
         self.slide_count = 0
+        self.page_beats = []
 
     def handle_starttag(self, tag, attributes):
         attributes = dict(attributes)
@@ -50,8 +51,11 @@ class Page(HTMLParser):
             if identifier in self.identifiers:
                 self.errors.append("duplicate HTML id")
             self.identifiers.add(identifier)
-        if "slide" in attributes.get("class", "").split():
+        classes = attributes.get("class", "").split()
+        if "slide" in classes:
             self.slide_count += 1
+        if "page" in classes and attributes.get("data-beats", "").isdigit():
+            self.page_beats.append(int(attributes["data-beats"]))
         for attribute in ("src", "href", "poster"):
             if attributes.get(attribute):
                 self.references.append(attributes[attribute])
@@ -140,7 +144,13 @@ def validate_site(directory):
             target_page = pages[destination]
             fragment = unquote(parsed.fragment)
             is_slide_hash = fragment.isdigit() and int(fragment) < target_page.slide_count
-            if fragment not in target_page.identifiers and not is_slide_hash:
+            beat_match = re.fullmatch(r"(\d+)-(\d+)", fragment)
+            is_page_beat_hash = bool(
+                beat_match
+                and 1 <= int(beat_match.group(1)) <= len(target_page.page_beats)
+                and 1 <= int(beat_match.group(2)) <= target_page.page_beats[int(beat_match.group(1)) - 1]
+            )
+            if fragment not in target_page.identifiers and not is_slide_hash and not is_page_beat_hash:
                 errors.append(f"{relative}: missing local fragment or invalid slide hash")
     return errors
 
@@ -244,6 +254,16 @@ class ValidatorTests(unittest.TestCase):
         (self.root / "index.html").write_text(sample_html('<a href="deck/#0">Deck</a>'), encoding="utf-8")
         self.assertEqual(validate_site(self.root), [])
         (self.root / "index.html").write_text(sample_html('<a href="deck/#2">Deck</a>'), encoding="utf-8")
+        self.assertTrue(any("invalid slide hash" in error for error in validate_site(self.root)))
+
+    def test_page_beat_hash(self):
+        deck = self.root / "deck"
+        deck.mkdir()
+        pages = '<section class="page" data-beats="3">First</section><section class="page" data-beats="6">Second</section>'
+        (deck / "index.html").write_text(sample_html(pages), encoding="utf-8")
+        (self.root / "index.html").write_text(sample_html('<a href="deck/#2-6">Deck</a>'), encoding="utf-8")
+        self.assertEqual(validate_site(self.root), [])
+        (self.root / "index.html").write_text(sample_html('<a href="deck/#2-7">Deck</a>'), encoding="utf-8")
         self.assertTrue(any("invalid slide hash" in error for error in validate_site(self.root)))
 
     def test_invalid_json(self):

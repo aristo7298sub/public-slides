@@ -46,13 +46,28 @@
       overflow-wrap: anywhere;
     }
     .section-heading { margin: 0; padding-bottom: 16px; border-bottom: 1px solid var(--line); font-size: 20px; font-weight: 500; }
-    .empty { margin: 0; padding: 32px 0; color: var(--muted); font-size: 17px; line-height: 1.6; }
+    .deck-list { list-style: none; margin: 0; padding: 0; }
+    .deck-link {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .deck-link span { font: 500 28px/1.25 "IBM Plex Serif", serif; overflow-wrap: anywhere; }
+    .deck-link small { color: var(--muted); font-size: 14px; }
+    .deck-link:hover span { color: var(--accent); }
     footer { padding: 24px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
     @media (max-width: 600px) {
       .page { width: calc(100% - 32px); }
       header { padding: 24px 0; gap: 16px; flex-wrap: wrap; }
       main { padding: 40px 0 64px; }
       h1 { margin-bottom: 32px; font-size: 36px; }
+      .deck-link { grid-template-columns: 1fr; gap: 8px; padding: 24px 0; }
+      .deck-link span { font-size: 24px; }
     }
   </style>
 </head>
@@ -69,7 +84,14 @@
       <h1>Aristoma Slides</h1>
       <section aria-labelledby="presentations">
         <h2 id="presentations" class="section-heading">Presentations</h2>
-        <p class="empty">No presentations published.</p>
+        <ul class="deck-list">
+          <li>
+            <a class="deck-link" href="./ai-and-self/#1-1">
+              <span>如何自处？</span>
+              <small>两则故事 · 15 个节拍</small>
+            </a>
+          </li>
+        </ul>
       </section>
     </main>
     <footer>Public presentations by Aristoma</footer>

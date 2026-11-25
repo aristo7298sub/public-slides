@@ -31,7 +31,7 @@ The site check uses Python's standard library. Structured workflow validation us
 
 Checks cover allowed file types, private configuration, symlinks, UTF-8/JSON metadata, HTML resource references, local fragments/slide hashes, path traversal, and selected credential patterns. They are not an exhaustive secret scan or content clearance. CSS URLs, external availability, rendered layouts, speaker notes, hidden slides, assets, and public-readability still need human/browser review.
 
-The initial collection page is empty. Its font and avatar are public external resources; it is not an offline-ready deck or a published presentation.
+The collection currently contains `如何自处？` at `site/ai-and-self/`. Its source artifact is a self-contained HTML file; the collection font/avatar and the deck fonts are public external resources, so browser availability was checked but offline behavior is not guaranteed.
 
 ## Publish
 
@@ -39,7 +39,7 @@ The `Publish public slides` workflow runs only through `workflow_dispatch`. It r
 
 The workflow validates the complete site, then uploads only `site/` to the existing Free Azure Static Web App. It does not build an API, create Azure resources, register a domain, or change DNS. The `AZURE_STATIC_WEB_APPS_API_TOKEN` Actions Secret must belong to that approved site; never place its value in a file, command argument, or chat.
 
-Source updates and production publication require separate review. During initial setup, the workflow is prepared but not triggered; the live endpoint remains Azure's platform placeholder until a separately approved release.
+Source updates and production publication require separate review. The first deck and collection page have passed local validation and browser review, but the live endpoint remains Azure's platform placeholder until a separately approved workflow run succeeds.
 
 The default endpoint is `https://yellow-desert-0fac5eb00.5.azurestaticapps.net/`. Domain registration and binding are separate work and have not been completed.
 

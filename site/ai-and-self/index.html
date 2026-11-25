@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>如何自处？</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:#FAF7F2;color:#46403A;-webkit-font-smoothing:antialiased}
+:root{
+  --ink:#46403A;--ink-muted:#8C8277;--paper:#FFFDF9;--bg-wash:#F2ECE1;
+  --sage:#5E8573;--sage-wash:rgba(107,144,128,.20);
+  --terra:#CE6A52;--terra-wash:rgba(217,107,82,.18);
+  --amber:#CF9248;--amber-wash:rgba(224,169,109,.22);
+  --slate:#73899B;--slate-wash:rgba(124,144,160,.18);
+  --serif:'Noto Serif SC','Songti SC','STSong','SimSun',Georgia,serif;
+  --sans:'Plus Jakarta Sans','PingFang SC','Microsoft YaHei',sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+.page{position:fixed;inset:0;display:flex;flex-direction:column;overflow:hidden;
+  background:radial-gradient(ellipse 75% 65% at 50% 42%,#FFFDF9 0%,#FAF7F2 62%,#F3ECE0 100%);
+  opacity:0;visibility:hidden;transition:opacity .9s ease,visibility 0s linear .9s}
+.page::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
+  background-image:radial-gradient(rgba(70,64,58,.045) 1px,transparent 0);background-size:24px 24px}
+.page.active{opacity:1;visibility:visible;transition:opacity 1s ease .25s}
+.page:not(.active) *{animation-play-state:paused!important}
+.stage{position:relative;z-index:1;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;
+  padding:clamp(.8rem,3vh,2.4rem) clamp(1rem,3vw,3rem);cursor:pointer;user-select:none}
+.scene-svg{width:100%;height:100%;max-width:1320px;overflow:visible}
+
+.title-card{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.title-card h1{font-family:var(--serif);font-weight:300;font-size:clamp(2.4rem,7vw,5.2rem);letter-spacing:.24em;padding-left:.24em;
+  opacity:0;transform:translateY(14px);transition:opacity 1.2s ease,transform 1.4s var(--ease)}
+.title-card .rule{margin-top:clamp(1rem,3vh,1.8rem);height:1.5px;width:min(30vw,320px);background:var(--amber);opacity:.7;
+  transform:scaleX(0);transition:transform 1.6s var(--ease) .8s}
+.title-card.in h1{opacity:1;transform:none}
+.title-card.in .rule{transform:scaleX(1)}
+.title-card.in.out h1,.title-card.in.out .rule{opacity:0;transition:opacity .6s ease}
+
+.end-title{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;padding-bottom:10vh}
+.end-title h1{font-family:var(--serif);font-weight:300;font-size:clamp(2.6rem,7.4vw,5.8rem);letter-spacing:.26em;padding-left:.26em;color:var(--ink);
+  opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.end-title .rule{margin-top:clamp(1rem,3vh,1.8rem);height:1.5px;width:min(26vw,280px);background:var(--amber);opacity:.7;transform:scaleX(0);transition:transform .6s ease}
+.end-title.in h1{opacity:1;transform:none;transition:opacity 2.4s ease 2.2s,transform 2.6s var(--ease) 2.2s}
+.end-title.in .rule{transform:scaleX(1);transition:transform 1.8s var(--ease) 3.6s}
+
+.progress{position:fixed;left:0;bottom:0;height:2px;background:rgba(207,146,72,.45);z-index:10;transition:width .6s var(--ease)}
+.cue{position:fixed;right:1rem;top:1rem;z-index:20;font-family:var(--sans);font-size:.78rem;color:var(--ink-muted);
+  background:rgba(255,253,249,.88);border:1px solid rgba(70,64,58,.12);border-radius:999px;padding:.3rem .8rem;opacity:0;pointer-events:none;transition:opacity .3s}
+body.show-cue .cue{opacity:1}
+@media (max-width:600px){
+  .cue{left:50%;right:auto;top:auto;bottom:clamp(.8rem,3vh,1.3rem);width:max-content;max-width:calc(100vw - 2rem);
+    transform:translateX(-50%);font-size:.9rem;line-height:1.45;text-align:center;white-space:normal;opacity:1}
+}
+
+/* ---------- SVG primitives ---------- */
+.ink{fill:none;stroke:var(--ink);stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round}
+.mut{fill:none;stroke:var(--ink-muted);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.sl{fill:none;stroke:var(--slate);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.sg{fill:none;stroke:var(--sage);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tr{fill:none;stroke:var(--terra);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.am{fill:none;stroke:var(--amber);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dash{stroke-dasharray:5 6}
+.t-serif{font-family:var(--serif);font-weight:400;letter-spacing:.1em;fill:var(--ink)}
+.t-sans{font-family:var(--sans);fill:var(--slate)}
+.blk{font-family:var(--serif);font-size:16px;letter-spacing:.1em;fill:var(--ink)}
+.fb{transform-box:fill-box;transform-origin:center}
+.fbb{transform-box:fill-box;transform-origin:50% 100%}
+
+/* ---------- beat engine ---------- */
+.scene{opacity:0;transition:opacity .6s ease;pointer-events:none}
+.scene.in{opacity:1;transition:opacity .9s ease .3s}
+.scene.in.out{opacity:0;transition:opacity .6s ease}
+.fx{opacity:0;transform:translateY(var(--y,10px));transition:opacity .5s ease,transform .7s ease}
+.fx.in{opacity:1;transform:none;transition:opacity var(--ft,.9s) ease var(--d,0s),transform 1s var(--ease) var(--d,0s)}
+.fx.in.out{opacity:var(--out,0);transition:opacity .9s ease}
+.draw{stroke-dasharray:1 1;stroke-dashoffset:1;opacity:0;transition:stroke-dashoffset .5s ease,opacity .4s ease}
+.draw.in{stroke-dashoffset:0;opacity:1;transition:stroke-dashoffset var(--t,1.4s) cubic-bezier(.45,.05,.25,1) var(--d,0s),opacity .15s linear var(--d,0s)}
+.bar{transform-box:fill-box;transform-origin:0 50%;transform:scaleX(0);transition:transform .4s ease}
+.bar.in{transform:scaleX(1);transition:transform var(--t,1.5s) cubic-bezier(.3,.1,.3,1) var(--d,0s)}
+
+/* loops */
+.bob{animation:bob 3.2s ease-in-out infinite}
+.beat{animation:beat 1.3s ease-in-out infinite}
+.breathe{animation:breathe 3.6s ease-in-out infinite}
+.wave-drift{animation:waveDrift 4.5s ease-in-out infinite}
+.bubble-rise{animation:rise 4s ease-in infinite}
+.drip{animation:drip 1.8s ease-in infinite}
+.wobble{animation:wobble 1.6s ease-in-out infinite}
+.stomp{animation:stomp 1.8s ease-in-out infinite}
+.tremor{animation:tremor 1.8s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.steam{animation:steam 3.4s ease-in-out infinite}
+.sway{animation:sway 4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.spin{animation:spin 6s linear infinite}
+.twinkle{animation:twinkle 2.4s ease-in-out infinite}
+.paper-fly{animation:paperFly 1.1s ease-in infinite}
+.drift{animation:drift 16s ease-in-out infinite}
+.float{animation:floatUp 9s ease-in-out infinite}
+.glow-up{animation:glowUp 2.6s ease-in-out infinite}
+
+/* page 1 choreography */
+.playhead{transition:transform 1.2s var(--ease)}
+.tl-label{fill:var(--ink-muted);font-family:var(--serif);font-size:13px;letter-spacing:.06em;transition:fill .5s ease,opacity .5s ease;opacity:.75}
+.tl-label.cur{fill:var(--ink);opacity:1;font-weight:500}
+.bar-slow.in{transition:transform 5s linear .8s}
+.w1.in{animation:w1Trip 8s ease-in-out .4s both}
+.w1.in .w1-face{animation:w1Flip 8s linear .4s both}
+.belly-fill{opacity:0}
+.w1.in .belly-ring{animation:ringOut 8s linear .4s both}
+.w1.in .belly-fill{animation:fillIn 8s linear .4s both}
+.eat1.in{animation:nibble 8s linear .4s both}
+.plusLife,.minusLife{opacity:0}
+.plusLife.in{animation:plusLife 8s linear .4s both}
+.minusLife.in{animation:minusLife 8s linear .4s both}
+.fish5.in{animation:fishLoop 8s ease-in-out .3s both}
+.orb5.in{animation:orbLife 8s linear .3s both}
+.food1,.food2{opacity:0}
+.food1.in{animation:food1 8s ease-in .3s both}
+.food2.in{animation:food2 8s ease-in .3s both}
+.gauge{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(.04)}
+.gWant.in{animation:want 8s linear .3s both}
+.gLike.in{animation:like 8s linear .3s both}
+.dino.in{animation:dinoIn 1.6s ease-out .1s both}
+.mouse-run.in{animation:mouseRun 1.6s ease-in-out 4.8s both}
+.mouse-run.in .mouse-face{animation:faceLeft .2s linear 4.7s both}
+.turn{transform:scaleX(-1)}
+.turn.in{animation:turnR .35s ease 3.3s both}
+.tagFly{opacity:0}
+.tagFly.in{animation:tagFly 1.6s cubic-bezier(.45,.05,.25,1) 3.8s both}
+.drain.in{animation:fadeAway 1.2s ease 5.2s both}
+.greyIn{opacity:0}
+.greyIn.in{animation:fadeIn 1.2s ease 5.2s both}
+.stack{transition:transform 1.6s cubic-bezier(.45,.05,.25,1)}
+.stack.in{transform:translateX(-350px)}
+
+/* page 2 choreography */
+.felt-move{transition:transform 1.6s cubic-bezier(.45,.05,.25,1);transform-origin:744px 440px}
+.felt-move.in{transform:translate(200px,90px) scale(.5)}
+.walkin.in{animation:walkIn 1.8s ease-out 2.4s both}
+.down{transition:transform 1.6s cubic-bezier(.45,.05,.25,1) .3s}
+.down1.in{transform:translateY(-10px)}
+.down2.in{transform:translateY(40px)}
+.down3.in{transform:translateY(90px)}
+.swapOut.in{animation:fadeAway .6s ease 1.2s both}
+.swapIn{opacity:0}
+.swapIn.in{animation:fadeIn .8s ease 1.4s both}
+
+/* keyframes */
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.16)}30%{transform:scale(.97)}45%{transform:scale(1.1)}}
+@keyframes breathe{0%,100%{opacity:.7;transform:scale(.96)}50%{opacity:1;transform:scale(1.04)}}
+@keyframes waveDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(10px)}}
+@keyframes rise{0%{transform:translateY(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-120px);opacity:0}}
+@keyframes drip{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(26px);opacity:0}}
+@keyframes wobble{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+@keyframes stomp{0%,100%{transform:translateY(0)}45%{transform:translateY(-6px)}55%{transform:translateY(0)}}
+@keyframes tremor{0%,50%{opacity:0;transform:scaleX(.7)}55%{opacity:.6}100%{opacity:0;transform:scaleX(1.5)}}
+@keyframes steam{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-6px);opacity:1}}
+@keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes paperFly{0%{transform:translate(0,0) rotate(0);opacity:0}15%{opacity:1}100%{transform:translate(52px,40px) rotate(25deg);opacity:0}}
+@keyframes drift{0%,100%{transform:translateX(0)}50%{transform:translateX(30px)}}
+@keyframes floatUp{0%{transform:translateY(0);opacity:0}20%{opacity:.9}100%{transform:translateY(-140px);opacity:0}}
+@keyframes glowUp{0%,100%{opacity:0}40%{opacity:.9}}
+@keyframes fadeAway{to{opacity:0}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes w1Trip{0%,14%{transform:translateX(0)}38%,58%{transform:translateX(172px)}100%{transform:translateX(-30px)}}
+@keyframes w1Flip{0%,58%{transform:scaleX(1)}62%,100%{transform:scaleX(-1)}}
+@keyframes ringOut{0%,44%{opacity:1}50%,100%{opacity:0}}
+@keyframes fillIn{0%,44%{opacity:0}50%,100%{opacity:1}}
+@keyframes nibble{0%,40%{transform:scaleY(1)}52%,100%{transform:scaleY(.55)}}
+@keyframes plusLife{0%,10%{opacity:0}17%,50%{opacity:1}57%,100%{opacity:0}}
+@keyframes minusLife{0%,55%{opacity:0}63%,100%{opacity:1}}
+@keyframes fishLoop{0%,16%{transform:translateX(0)}30%,36%{transform:translateX(196px)}46%,54%{transform:translateX(60px)}72%,80%{transform:translateX(196px)}100%{transform:translateX(110px)}}
+@keyframes orbLife{0%,6%{opacity:.15}11%{opacity:1}24%{opacity:.3}50%{opacity:.15}55%{opacity:1}68%,100%{opacity:.3}}
+@keyframes food1{0%,13%{opacity:0;transform:translateY(0)}16%{opacity:1}29%{opacity:1;transform:translateY(108px)}33%,100%{opacity:0;transform:translateY(108px) scale(.2)}}
+@keyframes food2{0%,57%{opacity:0;transform:translateY(0)}60%{opacity:1}72%{opacity:1;transform:translateY(108px)}78%,100%{opacity:0;transform:translateY(108px) scale(.2)}}
+@keyframes want{0%,12%{transform:scaleY(.04)}29%,36%{transform:scaleY(.42)}50%{transform:scaleY(.12)}56%{transform:scaleY(.94)}72%{transform:scaleY(.88)}100%{transform:scaleY(.82)}}
+@keyframes like{0%,29%{transform:scaleY(.04)}34%{transform:scaleY(.52)}48%,73%{transform:scaleY(.2)}78%{transform:scaleY(.38)}100%{transform:scaleY(.24)}}
+@keyframes dinoIn{from{transform:translateX(220px);opacity:0}to{transform:none;opacity:1}}
+@keyframes mouseRun{to{transform:translateX(-140px)}}
+@keyframes faceLeft{to{transform:scaleX(-1)}}
+@keyframes turnR{from{transform:scaleX(-1)}to{transform:scaleX(1)}}
+@keyframes tagFly{0%{opacity:0;transform:translate(0,0) scale(.6)}20%{opacity:1;transform:translate(0,0) scale(1)}45%{transform:translate(0,0) scale(1)}100%{opacity:1;transform:translate(106px,92px) rotate(-8deg) scale(.9)}}
+@keyframes walkIn{from{transform:translateX(-240px);opacity:0}to{transform:none;opacity:1}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;
+    transition-duration:.15s!important;transition-delay:0s!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= shared defs ================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="softBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="26"/></filter>
+    <filter id="softBlurS" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+
+    <!-- people: feet at (0,0), facing right -->
+    <g id="fig-stand" fill="none" stroke="#46403A" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="0" cy="-98" r="12.5" fill="#FFFDF9"/>
+      <circle cx="5" cy="-99" r="1.6" fill="#46403A" stroke="none"/>
+      <path d="M0 -85 C1 -70 1 -56 0 -44"/>
+      <path d="M0 -44 L-9 0 M0 -44 L9 0"/>
+      <path d="M0 -76 C-7 -66 -10 -58 -10 -48 M0 -76 C7 -66 10 -58 10 -48" stroke-width="1.5"/>
+    </g>
+    <g id="fig-droop" fill="none" stroke="#46403A" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="9" cy="-88" r="12.5" fill="#FFFDF9"/>
+      <circle cx="14" cy="-83" r="1.6" fill="#46403A" stroke="none"/>
+      <path d="M10 -79 Q13 -77 16 -79" stroke-width="1.3"/>
+      <path d="M3 -76 C2 -64 1 -54 0 -44"/>
+      <path d="M0 -44 L-9 0 M0 -44 L9 0"/>
+      <path d="M2 -70 C-3 -60 -5 -52 -5 -44 M3 -70 C8 -60 9 -52 8 -44" stroke-width="1.5"/>
+    </g>
+    <g id="fig-open" fill="none" stroke="#46403A" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="0" cy="-98" r="12.5" fill="#FFFDF9"/>
+      <circle cx="-4" cy="-100" r="1.5" fill="#46403A" stroke="none"/>
+      <circle cx="4" cy="-100" r="1.5" fill="#46403A" stroke="none"/>
+      <path d="M-4 -94 Q0 -90 4 -94" stroke-width="1.3"/>
+      <path d="M0 -85 C1 -70 1 -56 0 -44"/>
+      <path d="M0 -44 L-9 0 M0 -44 L9 0"/>
+      <path d="M0 -76 C-10 -80 -18 -86 -25 -96 M0 -76 C10 -80 18 -86 25 -96" stroke-width="1.5"/>
+    </g>
+    <g id="fig-elder" fill="none" stroke="#46403A" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="10" cy="-86" r="12.5" fill="#FFFDF9"/>
+      <path d="M0 -92 C2 -100 14 -102 20 -94" stroke="#C8BFB2" stroke-width="3"/>
+      <circle cx="15" cy="-86" r="1.6" fill="#46403A" stroke="none"/>
+      <ellipse cx="19" cy="-80" rx="1.8" ry="1.4" fill="#46403A" stroke="none"/>
+      <path d="M4 -74 C-6 -62 -5 -52 0 -42"/>
+      <path d="M0 -42 L-8 0 M0 -42 L8 0"/>
+      <path d="M2 -66 L20 -50"/>
+      <path d="M20 -50 V0" stroke="#8C8277" stroke-width="2.6"/>
+    </g>
+    <g id="galileo" fill="none" stroke="#46403A" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-34 -36 L-26 -32 L-6 -104 L-14 -108 Z" fill="#FFFDF9"/>
+      <path d="M-6 -82 L-24 0 H24 L6 -82 Z" fill="#F2ECE1"/>
+      <path d="M-2 -70 L-26 -44"/>
+      <path d="M2 -70 L30 -88"/>
+      <circle cx="0" cy="-96" r="13" fill="#FFFDF9"/>
+      <path d="M-13 -100 C-12 -115 12 -115 13 -100 Z" fill="#46403A" fill-opacity=".75"/>
+      <path d="M-9 -90 C-10 -76 0 -68 0 -68 C0 -68 10 -76 9 -90" fill="#FFFDF9"/>
+      <circle cx="5" cy="-97" r="1.6" fill="#46403A" stroke="none"/>
+    </g>
+    <g id="robot">
+      <path d="M0 -112 V-124" stroke="#73899B" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="0" cy="-128" r="4.5" fill="#CF9248"/>
+      <rect x="-28" y="-112" width="56" height="46" rx="11" fill="#FFFDF9" stroke="#73899B" stroke-width="1.9"/>
+      <circle cx="-11" cy="-91" r="4.6" fill="#73899B"/><circle cx="11" cy="-91" r="4.6" fill="#73899B"/>
+      <path d="M-9 -77 H9" stroke="#73899B" stroke-width="1.8" stroke-linecap="round"/>
+      <rect x="-22" y="-60" width="44" height="46" rx="9" fill="rgba(124,144,160,.18)" stroke="#73899B" stroke-width="1.9"/>
+      <circle cx="0" cy="-37" r="5" fill="none" stroke="#CF9248" stroke-width="1.5"/>
+      <path d="M-22 -50 L-34 -28 M22 -50 L34 -28 M-10 -14 V0 M10 -14 V0" stroke="#73899B" stroke-width="1.8" stroke-linecap="round"/>
+    </g>
+    <g id="fish">
+      <ellipse cx="2" cy="3" rx="17" ry="8" fill="rgba(224,169,109,.30)"/>
+      <path d="M-14 0 C-6 -10 10 -10 18 0 C10 10 -6 10 -14 0 Z" fill="#FFFDF9" stroke="#46403A" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M-14 0 L-24 -8 L-22 0 L-24 8 Z" fill="#FFFDF9" stroke="#46403A" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M2 -6 C4 -2 4 2 2 6" fill="none" stroke="#CF9248" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="10" cy="-2" r="1.6" fill="#46403A"/>
+    </g>
+    <g id="mouse" fill="none" stroke="#46403A" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="0" cy="3" rx="18" ry="11" fill="rgba(224,169,109,.22)" stroke="none"/>
+      <path d="M-20 8 C-33 12 -40 5 -37 -4" stroke-width="1.35"/>
+      <path d="M-20 6 C-19 -8 -3 -12 12 -7 C19 -5 24 -1 21 4 C17 9 -8 11 -20 6 Z" fill="#FFFDF9" stroke-width="1.85"/>
+      <path d="M-1 -8 C-3 -16 6 -18 8 -10" fill="#FAF7F2" stroke-width="1.35"/>
+      <circle cx="13" cy="-2" r="1.8" fill="#46403A" stroke="none"/>
+      <path d="M22 0 L29 -2 M22 3 L30 3" stroke-width="1.1" opacity=".7"/>
+    </g>
+    <g id="monkey" fill="none" stroke="#46403A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-18 -10 C-40 -6 -44 -30 -30 -34 C-22 -36 -22 -26 -28 -26"/>
+      <ellipse cx="0" cy="-28" rx="20" ry="26" style="fill:var(--mkb,#FFFDF9)"/>
+      <ellipse cx="4" cy="-24" rx="11" ry="15" fill="#FFFDF9" fill-opacity=".55" stroke="none"/>
+      <path d="M14 -40 C24 -30 24 -16 18 -6"/>
+      <path d="M-14 -4 C-16 2 -6 3 2 0"/>
+      <circle cx="-13" cy="-68" r="7" style="fill:var(--mkh,#FFFDF9)"/>
+      <circle cx="21" cy="-68" r="7" style="fill:var(--mkh,#FFFDF9)"/>
+      <circle cx="4" cy="-66" r="17" style="fill:var(--mkh,#FFFDF9)"/>
+      <ellipse cx="7" cy="-61" rx="11" ry="10" fill="#FFFDF9" fill-opacity=".7" stroke="none"/>
+      <circle cx="2" cy="-66" r="1.7" fill="#46403A" stroke="none"/>
+      <circle cx="11" cy="-66" r="1.7" fill="#46403A" stroke="none"/>
+      <path d="M2 -57 Q7 -54 12 -57" stroke-width="1.4"/>
+    </g>
+    <g id="land" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="40" cy="-29" r="9" fill="rgba(224,169,109,.35)" stroke="#CF9248" stroke-width="1.6"/>
+      <path d="M-57 21 L-23 -21 L-5 -1 L17 -31 L57 21" stroke="#46403A" stroke-width="1.8"/>
+      <path d="M-55 29 C-25 21 15 33 55 25" stroke="#5E8573" stroke-width="1.8"/>
+    </g>
+    <path id="heart" d="M0 9 C-13 0 -11 -11 -4 -11 C-1 -11 0 -8 0 -7 C0 -8 1 -11 4 -11 C11 -11 13 0 0 9 Z"/>
+    <path id="star" d="M0 -6 L1.8 -1.9 L6 -1.9 L2.6 .8 L3.8 5 L0 2.4 L-3.8 5 L-2.6 .8 L-6 -1.9 L-1.8 -1.9 Z"/>
+    <g id="xmark"><circle r="14" fill="rgba(217,107,82,.20)"/><path d="M-6 -6 L6 6 M6 -6 L-6 6" stroke="#CE6A52" stroke-width="2.6" stroke-linecap="round"/></g>
+    <g id="vmark"><circle r="15" fill="rgba(107,144,128,.24)"/><path d="M-7 0 L-2 5 L8 -6" fill="none" stroke="#5E8573" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g id="page"><rect x="-14" y="-18" width="28" height="36" rx="3" fill="#FFFDF9" stroke="#8C8277" stroke-width="1.4"/><path d="M-8 -9 H8 M-8 -3 H8 M-8 3 H4" stroke="#C8BFB2" stroke-width="1.4" stroke-linecap="round"/></g>
+    <g id="tagShape"><path d="M-36 -16 H22 L38 0 L22 16 H-36 Z" fill="#FFFDF9" stroke="#8C8277" stroke-width="1.6" stroke-linejoin="round"/><circle cx="24" cy="0" r="3.2" fill="none" stroke="#8C8277" stroke-width="1.4"/></g>
+
+    <!-- block icons -->
+    <g id="ico-body"><use href="#heart" fill="rgba(217,107,82,.30)" stroke="#CE6A52" stroke-width="1.7" transform="scale(1.1)"/></g>
+    <g id="ico-good" stroke-linecap="round"><circle cx="-6" cy="-3" r="8" fill="rgba(107,144,128,.24)"/><circle cx="7" cy="4" r="8" fill="rgba(217,107,82,.22)"/>
+      <path d="M-10 -3 H-2 M-6 -7 V1" stroke="#5E8573" stroke-width="2"/><path d="M3 4 H11" stroke="#CE6A52" stroke-width="2"/></g>
+    <g id="ico-want"><path d="M-6 9 C-14 4 -11 -5 -6 -11 C-5 -5 0 -3 -1 3 C1 1 1 -2 0 -4 C4 1 3 8 -6 9 Z" fill="rgba(224,169,109,.35)" stroke="#CF9248" stroke-width="1.5" stroke-linejoin="round"/>
+      <use href="#heart" transform="translate(8 3) scale(.55)" fill="rgba(217,107,82,.2)" stroke="#CE6A52" stroke-width="2.4"/></g>
+    <g id="ico-world"><circle r="11" fill="rgba(124,144,160,.18)" stroke="#73899B" stroke-width="1.6"/><path d="M-11 3 H11" stroke="#73899B" stroke-width="1.4"/><circle cx="4" cy="-4" r="2.6" fill="#CF9248"/></g>
+    <g id="ico-self"><circle cx="-7" cy="-4" r="6" fill="rgba(224,169,109,.30)" stroke="#CF9248" stroke-width="1.5"/>
+      <circle cx="7" cy="-4" r="6" fill="rgba(224,169,109,.30)" stroke="#73899B" stroke-width="1.5"/>
+      <path d="M-15 10 C-15 3 1 3 1 10" fill="none" stroke="#CF9248" stroke-width="1.5" stroke-linecap="round"/><path d="M-1 10 C-1 3 15 3 15 10" fill="none" stroke="#73899B" stroke-width="1.5" stroke-linecap="round"/></g>
+    <g id="ico-tag"><path d="M-13 -7 H5 L12 0 L5 7 H-13 Z" fill="rgba(224,169,109,.25)" stroke="#8C8277" stroke-width="1.5" stroke-linejoin="round"/><circle cx="5.5" cy="0" r="1.8" fill="#8C8277"/><path d="M-9 0 H0" stroke="#8C8277" stroke-width="1.4" stroke-linecap="round"/></g>
+  </defs>
+</svg>
+
+<!-- =========================================================
+     PAGE 1 — 故事一：智能是怎样一层层长出来的
+     ========================================================= -->
+<section class="page" id="p1" data-beats="9">
+  <div class="title-card" data-at="1" data-out="2"><h1>如何自处？</h1><span class="rule"></span></div>
+  <div class="stage">
+  <svg class="scene-svg" viewBox="0 0 1000 560" role="img" aria-label="故事一：智能的五次进化">
+
+    <!-- ===== B2 · 焦虑：我比不过 AI ===== -->
+    <g class="scene" data-at="2" data-out="3">
+      <g class="fx" style="--d:.2s">
+        <rect x="350" y="52" width="300" height="108" rx="14" fill="#FFFDF9" stroke="#C8BFB2" stroke-width="1.4"/>
+        <circle cx="380" cy="88" r="9" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.6"/>
+        <rect x="400" y="81" width="220" height="14" rx="7" fill="var(--bg-wash)"/>
+        <rect class="bar bar-slow" x="400" y="81" width="80" height="14" rx="7" fill="var(--amber)"/>
+        <rect x="371" y="117" width="18" height="16" rx="4" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.6"/>
+        <path d="M380 117 V111" stroke="var(--slate)" stroke-width="1.5"/>
+        <rect x="400" y="118" width="220" height="14" rx="7" fill="var(--bg-wash)"/>
+        <rect class="bar" style="--d:.9s;--t:1.2s" x="400" y="118" width="214" height="14" rx="7" fill="var(--slate)"/>
+      </g>
+      <path class="draw ink" pathLength="1" d="M80 430 H920"/>
+      <path class="draw mut" pathLength="1" d="M110 432 V520 M890 432 V520" style="--d:.4s"/>
+      <g class="fx" style="--d:.5s">
+        <g transform="translate(250 470) scale(1.3)"><use href="#fig-droop"/></g>
+        <path class="ink" d="M290 428 H372 M372 428 L388 368" stroke-width="2.2"/>
+        <g transform="translate(330 404)"><use href="#page"/></g>
+        <path class="drip" d="M246 344 C243 350 243 354 246 355 C249 354 249 350 246 344 Z" fill="var(--slate-wash)" stroke="var(--slate)" stroke-width="1.2"/>
+        <path class="drip" style="animation-delay:.9s" d="M236 356 C233 362 233 366 236 367 C239 366 239 362 236 356 Z" fill="var(--slate-wash)" stroke="var(--slate)" stroke-width="1.2"/>
+        <g transform="translate(300 300)"><text class="wobble fb t-serif" font-size="34" fill="var(--ink-muted)" text-anchor="middle">?</text></g>
+      </g>
+      <g class="fx" style="--d:.8s">
+        <g transform="translate(690 470) scale(1.15)"><use href="#robot"/></g>
+        <path class="ink" d="M730 428 H812 M812 428 L828 368" stroke="var(--slate)" stroke-width="2.2"/>
+        <g transform="translate(830 372)"><g class="paper-fly"><use href="#page" transform="scale(.7)"/></g></g>
+        <g transform="translate(830 372)"><g class="paper-fly" style="animation-delay:.55s"><use href="#page" transform="scale(.7)"/></g></g>
+      </g>
+      <g class="pile" data-x="868" data-y="428" data-n="9" data-d0="1.2" data-step=".3"></g>
+    </g>
+
+    <!-- ===== B3 · 倒带 ===== -->
+    <g class="scene" data-at="3" data-out="4">
+      <g transform="translate(500 250)">
+        <circle r="70" fill="var(--amber-wash)" class="breathe fb"/>
+        <path class="am" d="M10 -26 L-26 0 L10 26 Z M44 -26 L8 0 L44 26 Z" fill="rgba(224,169,109,.35)" stroke-width="2.2"/>
+        <path class="draw am" pathLength="1" d="M-92 -40 A100 100 0 1 1 -92 40" style="--d:.4s;--t:1.6s"/>
+      </g>
+    </g>
+
+    <!-- ===== timeline ===== -->
+    <g data-at="3">
+      <path class="draw mut" pathLength="1" d="M80 520 H920" style="--t:1.2s"/>
+      <g class="fx" style="--d:.6s;--y:0px">
+        <path class="mut" d="M140 512 V528 M290 512 V528 M440 512 V528 M590 512 V528 M740 512 V528 M890 512 V528" stroke-width="1.4"/>
+        <text class="tl-label" data-stage="0" x="140" y="550" text-anchor="middle">5.5亿年前</text>
+        <text class="tl-label" data-stage="1" x="290" y="550" text-anchor="middle">5亿年前</text>
+        <text class="tl-label" data-stage="2" x="440" y="550" text-anchor="middle">1亿年前</text>
+        <text class="tl-label" data-stage="3" x="590" y="550" text-anchor="middle">2000万年前</text>
+        <text class="tl-label" data-stage="4" x="740" y="550" text-anchor="middle">30万年前</text>
+        <text class="tl-label" data-stage="5" x="890" y="550" text-anchor="middle">今天</text>
+        <g class="playhead" id="playhead"><circle cx="140" cy="520" r="13" fill="var(--amber-wash)"/><circle cx="140" cy="520" r="6" fill="var(--amber)"/></g>
+      </g>
+    </g>
+
+    <!-- ===== B4 · ① 发明了好坏 ===== -->
+    <g class="scene" data-at="4" data-out="5">
+      <g class="wave-drift"><path class="sl" opacity=".4" d="M70 70 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0"/></g>
+      <path class="draw mut" pathLength="1" d="M70 402 C150 394 230 406 320 400 S520 394 700 402"/>
+      <g fill="none" stroke="var(--slate)" stroke-width="1.2" opacity=".5">
+        <circle class="bubble-rise" cx="180" cy="380" r="4"/><circle class="bubble-rise" style="animation-delay:-1.3s" cx="380" cy="390" r="3"/><circle class="bubble-rise" style="animation-delay:-2.6s" cx="560" cy="380" r="3.5"/>
+      </g>
+      <!-- the stone in the sun: no + and no − -->
+      <g class="fx" style="--d:.2s">
+        <path class="am" d="M612 96 L628 316 M648 96 L664 316 M684 96 L700 316" stroke-dasharray="3 7" stroke-width="1.3" opacity=".55"/>
+        <path d="M606 402 C608 366 636 346 664 348 C694 350 712 372 710 402 Z" fill="var(--bg-wash)" stroke="var(--ink)" stroke-width="1.85" stroke-linejoin="round"/>
+        <path class="mut" d="M628 372 C636 362 648 358 660 358" stroke-width="1.3"/>
+      </g>
+      <!-- algae -->
+      <g class="eat1 fbb" data-at="4"><g class="fx" style="--d:.4s">
+        <path class="sg" d="M450 402 C444 380 452 364 446 346 M462 402 C466 380 458 362 466 338 M474 402 C480 384 472 370 480 352" stroke-width="2.4"/>
+      </g></g>
+      <!-- one scent, two signs -->
+      <circle class="plusLife" data-at="4" cx="462" cy="296" r="48" fill="var(--sage-wash)"/>
+      <circle class="minusLife" data-at="4" cx="462" cy="296" r="48" fill="var(--terra-wash)"/>
+      <g class="fx" style="--d:.6s" fill="var(--ink-muted)">
+        <circle cx="446" cy="286" r="2.6"/><circle cx="466" cy="276" r="2.2"/><circle cx="482" cy="294" r="2.8"/>
+        <circle cx="454" cy="308" r="2.2"/><circle cx="476" cy="312" r="2.4"/><circle cx="438" cy="300" r="1.8"/><circle cx="490" cy="276" r="1.8"/>
+      </g>
+      <g class="plusLife" data-at="4"><circle cx="462" cy="216" r="20" fill="var(--sage-wash)"/><path d="M451 216 H473 M462 205 V227" stroke="var(--sage)" stroke-width="3.2" stroke-linecap="round"/></g>
+      <g class="minusLife" data-at="4"><circle cx="462" cy="216" r="20" fill="var(--terra-wash)"/><path d="M451 216 H473" stroke="var(--terra)" stroke-width="3.2" stroke-linecap="round"/></g>
+      <!-- the worm -->
+      <g class="w1" data-at="4"><g transform="translate(250 384)"><g class="w1-face fb">
+        <ellipse cx="0" cy="8" rx="46" ry="7" fill="var(--sage-wash)"/>
+        <path class="ink" d="M-42 2 C-30 -12 -16 12 0 0 C12 -10 24 -6 32 -4" stroke-width="3"/>
+        <circle cx="38" cy="-4" r="7" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.8"/>
+        <circle cx="40" cy="-6" r="1.8" fill="var(--ink)"/>
+        <circle class="belly-ring" cx="-4" cy="2" r="6" fill="#FFFDF9" stroke="var(--amber)" stroke-width="1.4" stroke-dasharray="2 2.4"/>
+        <circle class="belly-fill" cx="-4" cy="2" r="6" fill="var(--amber)"/>
+      </g></g></g>
+    </g>
+
+    <!-- ===== B5 · ② 想要 ≠ 喜欢 ===== -->
+    <g class="scene" data-at="5" data-out="6">
+      <g class="wave-drift"><path class="sl" opacity=".4" d="M70 70 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0"/></g>
+      <path class="draw mut" pathLength="1" d="M70 412 H700"/>
+      <!-- the signal light -->
+      <path class="mut" d="M440 76 V128" stroke-width="1.2"/>
+      <circle class="orb5" data-at="5" cx="440" cy="142" r="36" fill="rgba(224,169,109,.38)"/>
+      <circle cx="440" cy="142" r="13" fill="#FFFDF9" stroke="var(--amber)" stroke-width="2"/>
+      <g class="food1" data-at="5"><circle cx="440" cy="172" r="6" fill="var(--terra)" opacity=".85"/></g>
+      <g class="food2" data-at="5"><circle cx="440" cy="172" r="6" fill="var(--terra)" opacity=".85"/></g>
+      <g class="fish5" data-at="5"><g transform="translate(220 282) scale(1.5)"><g class="bob"><use href="#fish"/></g></g></g>
+      <!-- wanting vs liking -->
+      <g class="fx" style="--d:.4s">
+        <path d="M590 124 C581 116 585 106 590 98 C592 104 598 108 595 116 C598 114 598 110 597 106 C603 113 600 124 590 124 Z" fill="var(--amber-wash)" stroke="var(--amber)" stroke-width="1.4" stroke-linejoin="round"/>
+        <g transform="translate(652 112) scale(1.15)"><use href="#heart" fill="var(--terra-wash)" stroke="var(--terra)" stroke-width="1.4"/></g>
+        <rect x="577" y="136" width="26" height="210" rx="13" fill="#FFFDF9" stroke="var(--amber)" stroke-width="1.6"/>
+        <rect x="639" y="136" width="26" height="210" rx="13" fill="#FFFDF9" stroke="var(--terra)" stroke-width="1.6"/>
+        <rect class="gauge gWant" data-at="5" x="581" y="140" width="18" height="202" rx="9" fill="var(--amber)" opacity=".85"/>
+        <rect class="gauge gLike" data-at="5" x="643" y="140" width="18" height="202" rx="9" fill="#E3A08D"/>
+        <text class="t-serif" x="590" y="374" text-anchor="middle" font-size="15">想要</text>
+        <text class="t-serif" x="652" y="374" text-anchor="middle" font-size="15">喜欢</text>
+      </g>
+    </g>
+
+    <!-- ===== B6 · ③ 另一个世界 ===== -->
+    <g class="scene" data-at="6" data-out="7">
+      <ellipse cx="230" cy="402" rx="70" ry="26" fill="var(--bg-wash)"/>
+      <path class="draw ink" pathLength="1" d="M60 360 H200 C206 360 206 394 230 394 C254 394 254 360 260 360 H700"/>
+      <g class="fx" style="--d:.3s">
+        <circle cx="86" cy="342" r="28" fill="var(--sage-wash)"/>
+        <path class="sg" d="M62 360 C60 336 74 322 86 320 C98 322 112 336 110 360"/>
+        <circle cx="78" cy="340" r="5" fill="var(--terra)"/><circle cx="92" cy="334" r="5" fill="var(--terra)"/><circle cx="94" cy="348" r="5" fill="var(--terra)" opacity=".8"/>
+      </g>
+      <g class="dino" data-at="6">
+        <g class="stomp">
+          <path class="ink" d="M474 250 C440 250 410 262 378 288 C412 282 444 278 476 276" fill="rgba(140,130,119,.12)"/>
+          <rect x="528" y="284" width="22" height="74" rx="6" fill="#F2ECE1" stroke="var(--ink-muted)" stroke-width="1.6"/>
+          <rect x="628" y="284" width="22" height="74" rx="6" fill="#F2ECE1" stroke="var(--ink-muted)" stroke-width="1.6"/>
+          <path class="ink" d="M630 222 C650 190 660 150 668 120 L686 124 C680 160 670 200 648 244" fill="rgba(140,130,119,.12)"/>
+          <path class="ink" d="M470 262 C470 210 520 196 570 198 C620 200 652 222 650 262 C648 292 600 300 560 300 C510 300 470 292 470 262 Z" fill="#EFE7DA"/>
+          <ellipse cx="682" cy="114" rx="20" ry="12" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.85"/>
+          <circle cx="690" cy="110" r="2" fill="var(--ink)"/>
+          <rect x="496" y="286" width="24" height="74" rx="6" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.85"/>
+          <rect x="598" y="286" width="24" height="74" rx="6" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.85"/>
+        </g>
+        <ellipse class="tremor" cx="508" cy="362" rx="40" ry="5" fill="none" stroke="var(--terra)" stroke-width="1.3"/>
+        <ellipse class="tremor" style="animation-delay:.1s" cx="610" cy="362" rx="40" ry="5" fill="none" stroke="var(--terra)" stroke-width="1.3"/>
+      </g>
+      <!-- a world inside the head -->
+      <g class="fx" style="--d:1s">
+        <circle cx="244" cy="334" r="3.5" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.3"/>
+        <circle cx="252" cy="306" r="6" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.3"/>
+        <circle cx="258" cy="168" r="124" fill="var(--amber-wash)" opacity=".55" class="breathe fb"/>
+        <circle cx="258" cy="168" r="106" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.6"/>
+        <clipPath id="cpGlobe"><circle cx="258" cy="168" r="104"/></clipPath>
+        <g clip-path="url(#cpGlobe)">
+          <rect x="150" y="206" width="220" height="80" fill="var(--bg-wash)"/>
+          <path class="mut" d="M150 206 H370" stroke-width="1.4"/>
+          <rect x="322" y="128" width="14" height="78" rx="4" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.4"/>
+          <rect x="342" y="128" width="12" height="76" rx="4" fill="#F2ECE1" stroke="var(--ink-muted)" stroke-width="1.2"/>
+          <path class="mut" d="M300 126 C320 116 350 116 372 124" stroke-width="1.4"/>
+          <g transform="translate(176 194)"><circle cx="-5" cy="0" r="4.5" fill="var(--terra)"/><circle cx="5" cy="-3" r="4.5" fill="var(--terra)"/><circle cx="3" cy="6" r="4" fill="var(--terra)" opacity=".8"/></g>
+          <g transform="translate(258 200) scale(.62)"><use href="#mouse"/></g>
+          <circle cx="210" cy="104" r="1.6" fill="var(--amber)" class="twinkle"/><circle cx="292" cy="92" r="1.4" fill="var(--amber)" class="twinkle" style="animation-delay:-1s"/>
+        </g>
+      </g>
+      <path class="fx tr" style="--d:1.8s" stroke-dasharray="5 5" stroke-width="2.2" d="M272 192 C290 176 304 168 316 164"/>
+      <g class="fx" style="--d:2.6s"><g transform="translate(306 140) scale(.85)"><use href="#xmark"/></g></g>
+      <path class="draw sg" pathLength="1" style="--d:3.1s;stroke-width:2.4" d="M242 194 C226 180 208 178 192 186"/>
+      <g class="fx" style="--d:3.9s"><g transform="translate(184 156) scale(.85)"><use href="#vmark"/></g></g>
+      <g class="mouse-run" data-at="6"><g transform="translate(232 368) scale(1.3)"><g class="mouse-face fb"><use href="#mouse"/></g></g></g>
+    </g>
+
+    <!-- ===== B7 · ④ 他人 · 自己 ===== -->
+    <g class="scene" data-at="7" data-out="8">
+      <path class="draw mut" pathLength="1" d="M60 400 H700"/>
+      <g class="fx" style="--d:.2s">
+        <path class="ink" d="M96 400 V262 M96 300 L74 278"/>
+        <g class="sway"><circle cx="96" cy="224" r="54" fill="var(--sage-wash)" stroke="var(--sage)" stroke-width="1.7"/></g>
+      </g>
+      <!-- A (amber) and B (blue) -->
+      <g class="fx" style="--d:.4s">
+        <circle cx="262" cy="350" r="60" fill="var(--amber-wash)" opacity=".7"/>
+        <g transform="translate(260 400) scale(1.3)"><use href="#monkey" style="--mkb:#EFC99C;--mkh:#EFC99C"/></g>
+      </g>
+      <g class="fx" style="--d:.6s">
+        <circle cx="538" cy="350" r="60" fill="var(--slate-wash)" opacity=".8"/>
+        <g transform="translate(540 400) scale(-1.3 1.3)"><use href="#monkey" style="--mkb:#C3D3E0;--mkh:#C3D3E0"/></g>
+      </g>
+      <!-- A imagines B — wearing A's own face -->
+      <g class="fx" style="--d:1.3s">
+        <circle cx="282" cy="292" r="3.5" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.3"/>
+        <circle cx="292" cy="268" r="6" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.3"/>
+        <ellipse cx="258" cy="164" rx="94" ry="68" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.5" stroke-dasharray="7 5"/>
+        <circle cx="262" cy="168" r="24" fill="rgba(224,169,109,.38)" class="breathe fb"/>
+        <g transform="translate(258 220) scale(-.82 .82)"><use href="#monkey" style="--mkb:#C3D3E0;--mkh:#EFC99C"/></g>
+      </g>
+      <!-- B imagines A — wearing B's own face -->
+      <g class="fx" style="--d:3.2s">
+        <circle cx="518" cy="292" r="3.5" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.3"/>
+        <circle cx="508" cy="268" r="6" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.3"/>
+        <ellipse cx="542" cy="164" rx="94" ry="68" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.5" stroke-dasharray="7 5"/>
+        <circle cx="538" cy="168" r="24" fill="rgba(124,144,160,.36)" class="breathe fb"/>
+        <g transform="translate(542 220) scale(.82)"><use href="#monkey" style="--mkb:#EFC99C;--mkh:#C3D3E0"/></g>
+      </g>
+    </g>
+
+    <!-- ===== B8 · ⑤ 压缩与标签 ===== -->
+    <g class="scene" data-at="8" data-out="9">
+      <path class="draw mut" pathLength="1" d="M60 430 H700"/>
+      <!-- the elder passes a world on -->
+      <g class="fx" style="--d:.2s"><g transform="translate(130 430) scale(1.25)"><use href="#fig-elder"/></g></g>
+      <g class="fx" style="--d:.6s">
+        <path d="M168 238 L156 294 L196 240 Z" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
+        <rect x="120" y="150" width="150" height="92" rx="18" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.6"/>
+        <path d="M169 239 L195 239" stroke="#FFFDF9" stroke-width="3"/>
+        <g transform="translate(195 196) scale(.95)"><use href="#land"/></g>
+      </g>
+      <path class="fx am" style="--d:1.6s" stroke-dasharray="4 6" d="M272 190 C300 176 320 186 330 204"/>
+      <g class="fx" style="--d:2s">
+        <circle cx="326" cy="290" r="3" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.3"/>
+        <circle cx="332" cy="270" r="5" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.3"/>
+        <ellipse cx="350" cy="222" rx="54" ry="38" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.4" stroke-dasharray="6 5"/>
+        <g transform="translate(350 224) scale(.55)"><use href="#land"/></g>
+      </g>
+      <!-- the listener turns, and names someone in one word -->
+      <g transform="translate(330 430) scale(1.25)"><g class="turn fb" data-at="8"><g class="fx" style="--d:.4s"><use href="#fig-stand"/></g></g></g>
+      <g class="fx" style="--d:3.6s">
+        <path d="M384 300 L372 322 L398 306 Z" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.4" stroke-linejoin="round"/>
+        <rect x="380" y="256" width="122" height="50" rx="16" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.4"/>
+        <path d="M385 304 L397 304" stroke="#FFFDF9" stroke-width="2.5"/>
+      </g>
+      <g class="tagFly" data-at="8" style="transform-box:fill-box;transform-origin:center">
+        <g transform="translate(441 281)"><use href="#tagShape"/><text class="t-serif" x="-6" y="5" text-anchor="middle" font-size="15">内向</text></g>
+      </g>
+      <!-- a whole, many-coloured person -->
+      <g class="drain" data-at="8">
+        <g filter="url(#softBlurS)">
+          <circle cx="580" cy="334" r="26" fill="rgba(107,144,128,.38)"/>
+          <circle cx="600" cy="364" r="24" fill="rgba(217,107,82,.30)"/>
+          <circle cx="566" cy="376" r="22" fill="rgba(224,169,109,.40)"/>
+          <circle cx="598" cy="320" r="16" fill="rgba(124,144,160,.36)"/>
+        </g>
+      </g>
+      <g class="fx" style="--d:.8s"><g transform="translate(584 430) scale(-1.25 1.25)"><use href="#fig-stand"/></g></g>
+      <g class="greyIn" data-at="8"><circle cx="584" cy="360" r="40" fill="#E9E6E2" opacity=".55"/></g>
+    </g>
+
+    <!-- ===== the stack: each stage leaves a layer ===== -->
+    <g>
+      <g data-at="9">
+        <g class="fx" style="--d:1.6s">
+          <circle cx="500" cy="88" r="30" fill="#FFFDF9" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="490" cy="86" r="2.2" fill="var(--ink)"/><circle cx="510" cy="86" r="2.2" fill="var(--ink)"/>
+          <path class="ink" d="M490 98 Q500 106 510 98"/>
+          <path class="ink" d="M500 118 V130"/>
+        </g>
+        <path class="draw ink" pathLength="1" style="--d:2s;stroke-width:2" d="M416 146 C398 160 392 250 394 350 M584 146 C602 160 608 250 606 350"/>
+        <path class="draw ink" pathLength="1" style="--d:2.2s;stroke-width:2" d="M472 464 L462 516 M528 464 L538 516"/>
+        <g class="fx" style="--d:2.8s" fill="none" stroke="var(--terra)" stroke-width="2.2">
+          <rect class="glow-up" x="418" y="410" width="164" height="54" rx="12"/>
+          <rect class="glow-up" style="animation-delay:.22s" x="418" y="354" width="164" height="54" rx="12"/>
+          <rect class="glow-up" style="animation-delay:.44s" x="418" y="298" width="164" height="54" rx="12"/>
+          <rect class="glow-up" style="animation-delay:.66s" x="418" y="242" width="164" height="54" rx="12"/>
+          <rect class="glow-up" style="animation-delay:.88s" x="418" y="186" width="164" height="54" rx="12"/>
+          <rect class="glow-up" style="animation-delay:1.1s" x="418" y="130" width="164" height="54" rx="12"/>
+        </g>
+      </g>
+      <g class="stack" data-on="9">
+        <g class="fx" data-at="4" style="--d:.2s;--y:-30px">
+          <rect x="774" y="416" width="160" height="50" rx="10" fill="var(--terra-wash)"/>
+          <rect x="770" y="412" width="160" height="50" rx="10" fill="#FFFDF9" stroke="var(--terra)" stroke-width="1.7"/>
+          <g transform="translate(798 437)"><g class="beat fb"><use href="#ico-body"/></g></g>
+          <text class="blk" x="822" y="443">活的身体</text>
+        </g>
+        <g class="fx" data-at="4" style="--d:7.4s;--y:-40px">
+          <rect x="774" y="360" width="160" height="50" rx="10" fill="var(--sage-wash)"/>
+          <rect x="770" y="356" width="160" height="50" rx="10" fill="#FFFDF9" stroke="var(--sage)" stroke-width="1.7"/>
+          <g transform="translate(798 381)"><use href="#ico-good"/></g>
+          <text class="blk" x="822" y="387">发明了好坏</text>
+        </g>
+        <g class="fx" data-at="5" style="--d:7.8s;--y:-40px">
+          <rect x="774" y="304" width="160" height="50" rx="10" fill="var(--amber-wash)"/>
+          <rect x="770" y="300" width="160" height="50" rx="10" fill="#FFFDF9" stroke="var(--amber)" stroke-width="1.7"/>
+          <g transform="translate(798 325)"><use href="#ico-want"/></g>
+          <text class="blk" x="822" y="331">想要≠喜欢</text>
+        </g>
+        <g class="fx" data-at="6" style="--d:6.6s;--y:-40px">
+          <rect x="774" y="248" width="160" height="50" rx="10" fill="var(--slate-wash)"/>
+          <rect x="770" y="244" width="160" height="50" rx="10" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.7"/>
+          <g transform="translate(798 269)"><use href="#ico-world"/></g>
+          <text class="blk" x="822" y="275">另一个世界</text>
+        </g>
+        <g class="fx" data-at="7" style="--d:5.4s;--y:-40px">
+          <rect x="774" y="192" width="160" height="50" rx="10" fill="var(--terra-wash)"/>
+          <rect x="770" y="188" width="160" height="50" rx="10" fill="#FFFDF9" stroke="var(--terra)" stroke-width="1.7"/>
+          <g transform="translate(798 213)"><use href="#ico-self"/></g>
+          <text class="blk" x="822" y="219">他人·自己</text>
+        </g>
+        <g class="fx" data-at="8" style="--d:6.8s;--y:-40px">
+          <rect x="774" y="136" width="160" height="50" rx="10" fill="var(--bg-wash)"/>
+          <rect x="770" y="132" width="160" height="50" rx="10" fill="#FFFDF9" stroke="var(--ink-muted)" stroke-width="1.7"/>
+          <g transform="translate(798 157)"><use href="#ico-tag"/></g>
+          <text class="blk" x="822" y="163">压缩与标签</text>
+        </g>
+      </g>
+    </g>
+  </svg>
+  </div>
+</section>
+
+<!-- =========================================================
+     PAGE 2 — 故事二：什么才算更好的一个人？
+     ========================================================= -->
+<section class="page" id="p2" data-beats="6">
+  <div class="stage">
+  <svg class="scene-svg" viewBox="0 0 1000 560" role="img" aria-label="故事二：被量化的人">
+
+    <!-- ===== B1–2 · 伽利略：一只苹果，两种性质 ===== -->
+    <g class="scene" data-at="1" data-out="3">
+      <text class="fx t-serif" x="40" y="44" font-size="20" fill="var(--ink-muted)">四百年前</text>
+      <g class="fx" data-out="2" style="--d:.2s;--out:.3"><g transform="translate(110 470) scale(1.35)"><use href="#galileo"/></g></g>
+      <g class="fx" data-out="2" style="--d:.5s;--out:.3">
+        <path d="M470 92 C455 80 425 86 424 116 C423 146 446 166 470 160 C494 166 517 146 516 116 C515 86 485 80 470 92 Z" fill="rgba(217,107,82,.30)" stroke="var(--terra)" stroke-width="2.2"/>
+        <path class="ink" d="M470 92 C470 82 472 76 476 70"/>
+        <path d="M474 78 C484 68 498 70 502 76 C492 84 482 84 474 78 Z" fill="var(--sage-wash)" stroke="var(--sage)" stroke-width="1.6"/>
+        <path class="am dash" d="M152 340 C220 260 330 160 410 128" stroke-width="1.4"/>
+      </g>
+      <g class="fx" data-out="2" style="--d:1s;--out:.3">
+        <path class="ink" d="M414 196 H526"/>
+        <path class="ink" d="M420 198 C428 232 512 232 520 198" fill="#FFFDF9"/>
+        <g fill="var(--ink-muted)"><circle cx="450" cy="212" r="1.6"/><circle cx="470" cy="216" r="1.6"/><circle cx="490" cy="212" r="1.6"/><circle cx="460" cy="204" r="1.6"/><circle cx="480" cy="204" r="1.6"/></g>
+      </g>
+      <path class="draw sl" pathLength="1" style="--d:1.5s;stroke-width:2.2" d="M444 230 C410 256 372 270 344 290 M352 278 L344 290 L358 292"/>
+      <path class="draw tr" pathLength="1" style="--d:1.9s;stroke-width:2.2" d="M496 230 C530 256 568 270 596 290 M582 292 L596 290 L590 277"/>
+      <g class="fx" style="--d:2.2s">
+        <rect x="226" y="300" width="230" height="140" rx="16" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.8"/>
+        <text class="t-serif" x="341" y="334" text-anchor="middle" font-size="20" fill="var(--slate)">可测量</text>
+        <rect x="246" y="358" width="100" height="20" rx="3" fill="var(--slate-wash)" stroke="var(--slate)" stroke-width="1.4"/>
+        <path class="sl" stroke-width="1.2" d="M256 358 v8 M266 358 v5 M276 358 v8 M286 358 v5 M296 358 v8 M306 358 v5 M316 358 v8 M326 358 v5 M336 358 v8"/>
+        <text class="t-sans" x="296" y="404" text-anchor="middle" font-size="15">8 cm</text>
+        <path class="sl" d="M402 352 V392 M380 392 H424 M378 360 H426 M378 360 L370 378 H386 Z M426 360 L418 378 H434 Z"/>
+        <text class="t-sans" x="402" y="424" text-anchor="middle" font-size="15">150 g</text>
+      </g>
+      <g class="felt-move" data-on="2"><g class="fx" data-out="2" style="--d:2.6s;--out:.3">
+        <rect x="514" y="300" width="230" height="140" rx="16" fill="#FFFDF9" stroke="var(--terra)" stroke-width="1.8"/>
+        <text class="t-serif" x="629" y="334" text-anchor="middle" font-size="20" fill="var(--terra)">可感受</text>
+        <circle cx="560" cy="386" r="22" fill="rgba(217,107,82,.45)" filter="url(#softBlurS)"/>
+        <circle cx="560" cy="386" r="16" fill="rgba(217,107,82,.55)"/>
+        <g class="steam"><path class="am" d="M614 398 C606 386 622 378 614 366 M630 398 C622 386 638 378 630 366" stroke-width="1.8"/></g>
+        <circle cx="690" cy="380" r="17" fill="var(--amber-wash)" stroke="var(--ink)" stroke-width="1.6"/>
+        <circle cx="684" cy="376" r="1.8" fill="var(--ink)"/><circle cx="696" cy="376" r="1.8" fill="var(--ink)"/>
+        <path class="ink" d="M682 385 Q690 392 698 385" stroke-width="1.5"/>
+        <g transform="translate(626 420)"><use class="beat fb" href="#heart" fill="var(--terra-wash)" stroke="var(--terra)" stroke-width="1.4"/></g>
+      </g></g>
+      <!-- B2: 400 years of measurement -->
+      <g data-at="2">
+        <path class="draw am" pathLength="1" style="--d:.6s;--t:3.2s;stroke-width:3.2" d="M456 380 C560 370 700 300 900 150"/>
+        <path class="fx am" style="--d:3.6s" d="M884 150 L902 148 L896 166" stroke-width="3.2"/>
+        <text class="fx t-serif" style="--d:.8s" x="500" y="420" font-size="16" fill="var(--amber)">400 年</text>
+        <g class="fx" style="--d:1s"><g transform="translate(540 330)">
+          <rect x="-24" y="-7" width="48" height="14" rx="4" transform="rotate(-24)" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.7"/>
+          <path class="ink" d="M0 4 L-10 28 M0 4 L10 28" stroke-width="1.5"/>
+        </g></g>
+        <g class="fx" style="--d:1.6s"><g transform="translate(660 290)">
+          <g class="spin fb"><circle r="17" fill="none" stroke="var(--ink-muted)" stroke-width="7" stroke-dasharray="5 4.5"/><circle r="13" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.7"/><circle r="4.5" fill="none" stroke="var(--ink)" stroke-width="1.6"/></g>
+        </g></g>
+        <g class="fx" style="--d:2.2s"><g transform="translate(760 222) rotate(35)">
+          <path d="M0 -28 C12 -14 12 8 7 16 H-7 C-12 8 -12 -14 0 -28 Z" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.7"/>
+          <circle cx="0" cy="-8" r="4.5" fill="var(--slate-wash)" stroke="var(--slate)" stroke-width="1.4"/>
+          <path class="ink" d="M-7 6 L-14 18 L-7 16 M7 6 L14 18 L7 16" stroke-width="1.5"/>
+          <path class="breathe fb" d="M-4 18 Q0 32 4 18 Z" fill="var(--amber)"/>
+        </g></g>
+        <g class="fx" style="--d:2.8s"><g transform="translate(846 148)">
+          <rect x="-24" y="-20" width="48" height="34" rx="4" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.7"/>
+          <path class="sl" d="M-14 -8 H8 M-14 0 H14" stroke-width="1.4"/>
+          <path class="ink" d="M0 14 V22 M-12 22 H12" stroke-width="1.6"/>
+        </g></g>
+        <g class="fx" style="--d:3.6s"><g transform="translate(930 112)">
+          <circle r="34" fill="var(--slate-wash)" class="breathe fb"/>
+          <path d="M0 -22 V-30" stroke="var(--slate)" stroke-width="1.6"/><circle cy="-33" r="3.5" fill="var(--amber)"/>
+          <rect x="-20" y="-22" width="40" height="34" rx="8" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.8"/>
+          <circle cx="-8" cy="-6" r="3.5" fill="var(--slate)"/><circle cx="8" cy="-6" r="3.5" fill="var(--slate)"/>
+          <path d="M-6 4 H6" stroke="var(--slate)" stroke-width="1.6" stroke-linecap="round"/>
+        </g></g>
+      </g>
+    </g>
+
+    <!-- ===== B3 · 一切都在指标化，连人也是 ===== -->
+    <g class="scene" data-at="3" data-out="4">
+      <!-- everyday things, each with a score -->
+      <g class="fx" style="--d:.2s">
+        <rect x="90" y="56" width="120" height="150" rx="14" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.4"/>
+        <path class="ink" d="M150 104 C138 96 122 96 112 100 V140 C122 136 138 136 150 144 C162 136 178 136 188 140 V100 C178 96 162 96 150 104 Z M150 104 V144" stroke-width="1.6"/>
+      </g>
+      <g class="fx" style="--d:.5s">
+        <rect x="230" y="56" width="120" height="150" rx="14" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.4"/>
+        <path class="ink" d="M252 118 H328 C328 138 312 148 290 148 C268 148 252 138 252 118 Z" fill="var(--amber-wash)" stroke-width="1.6"/>
+        <g class="steam"><path class="am" d="M280 108 C274 100 286 94 280 84 M298 108 C292 100 304 94 298 84" stroke-width="1.5"/></g>
+      </g>
+      <g class="fx" style="--d:.8s">
+        <rect x="370" y="56" width="120" height="150" rx="14" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.4"/>
+        <path class="ink" d="M418 140 V94 L456 86 V130" stroke-width="1.8"/>
+        <ellipse cx="412" cy="142" rx="8" ry="6" fill="var(--ink)" transform="rotate(-20 412 142)"/>
+        <ellipse cx="450" cy="132" rx="8" ry="6" fill="var(--ink)" transform="rotate(-20 450 132)"/>
+      </g>
+      <g class="fx" style="--d:1.1s">
+        <rect x="510" y="56" width="120" height="150" rx="14" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.4"/>
+        <path class="ink" d="M536 148 V112 H556 V148 M556 148 V90 H582 V148 M582 148 V120 H604 V148 M528 148 H612" stroke-width="1.6"/>
+        <path class="mut" d="M562 100 H576 M562 112 H576 M562 124 H576" stroke-width="1.3"/>
+      </g>
+      <g class="fx" style="--d:1.4s">
+        <rect x="650" y="56" width="120" height="150" rx="14" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.4"/>
+        <path class="ink" d="M688 140 C680 140 676 132 680 122 L690 96 C692 90 700 90 702 96 L704 112 C714 116 728 122 732 132 C734 138 730 142 724 142 Z" fill="var(--sage-wash)" stroke-width="1.6"/>
+      </g>
+      <g class="fx" style="--d:1.7s">
+        <rect x="790" y="56" width="120" height="150" rx="14" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.4"/>
+        <path class="ink" d="M820 112 L850 98 L880 112 L850 126 Z" fill="var(--slate-wash)" stroke-width="1.6"/>
+        <path class="ink" d="M830 118 V134 C840 142 860 142 870 134 V118 M880 112 V132" stroke-width="1.6"/>
+      </g>
+      <!-- the scores -->
+      <g class="fx" style="--d:2s" fill="var(--amber)">
+        <use href="#star" x="124" y="178"/><use href="#star" x="137" y="178"/><use href="#star" x="150" y="178"/><use href="#star" x="163" y="178"/><use href="#star" x="176" y="178" fill="#E6DED2"/>
+      </g>
+      <g class="fx" style="--d:2.2s" fill="var(--amber)">
+        <use href="#star" x="264" y="178"/><use href="#star" x="277" y="178"/><use href="#star" x="290" y="178"/><use href="#star" x="303" y="178" fill="#E6DED2"/><use href="#star" x="316" y="178" fill="#E6DED2"/>
+      </g>
+      <g class="fx" style="--d:2.4s">
+        <path d="M392 172 L400 177 L392 182 Z" fill="var(--slate)"/>
+        <rect x="406" y="174" width="64" height="6" rx="3" fill="var(--bg-wash)"/>
+        <rect class="bar" style="--d:2.5s" x="406" y="174" width="50" height="6" rx="3" fill="var(--slate)"/>
+      </g>
+      <text class="fx t-sans" style="--d:2.6s" x="570" y="184" text-anchor="middle" font-size="16">No.3</text>
+      <text class="fx t-sans" style="--d:2.8s" x="710" y="184" text-anchor="middle" font-size="16">8,000</text>
+      <text class="fx t-sans" style="--d:3s" x="850" y="184" text-anchor="middle" font-size="16">#12</text>
+      <!-- …and then a person -->
+      <path class="draw mut" pathLength="1" style="--d:2.2s" d="M180 478 H820"/>
+      <g class="walkin" data-at="3"><g transform="translate(380 476) scale(1.3)"><use href="#fig-stand"/></g></g>
+      <g class="fx" style="--d:4.4s" fill="none" stroke="var(--slate)" stroke-width="2.4" stroke-linecap="round">
+        <path d="M336 330 V312 H354 M406 312 H424 V330 M424 462 V480 H406 M354 480 H336 V462"/>
+      </g>
+      <g class="fx" style="--d:4.9s">
+        <rect x="470" y="300" width="150" height="172" rx="14" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.6"/>
+        <circle cx="510" cy="330" r="12" fill="#FFFDF9" stroke="var(--ink)" stroke-width="1.6"/><circle cx="514" cy="329" r="1.5" fill="var(--ink)"/>
+        <text class="t-sans" x="596" y="336" text-anchor="end" font-size="16">#37</text>
+        <g fill="var(--bg-wash)"><rect x="488" y="364" width="112" height="9" rx="4.5"/><rect x="488" y="388" width="112" height="9" rx="4.5"/><rect x="488" y="412" width="112" height="9" rx="4.5"/><rect x="488" y="436" width="112" height="9" rx="4.5"/></g>
+        <g fill="var(--amber)">
+          <rect class="bar" style="--d:5.3s" x="488" y="364" width="62" height="9" rx="4.5"/>
+          <rect class="bar" style="--d:5.4s" x="488" y="388" width="80" height="9" rx="4.5"/>
+          <rect class="bar" style="--d:5.5s" x="488" y="412" width="40" height="9" rx="4.5"/>
+          <rect class="bar" style="--d:5.6s" x="488" y="436" width="70" height="9" rx="4.5"/>
+        </g>
+        
+      </g>
+    </g>
+
+    <!-- ===== B4–5 · 排名 → 什么才算更好的一个人？ ===== -->
+    <g class="scene" data-at="4" data-out="6">
+      <!-- the ranking stairs -->
+      <g class="fx" data-out="5" style="--d:.2s">
+        <path d="M220 470 V500 H780 V320 H640 V370 H500 V420 H360 V470 Z" fill="var(--bg-wash)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
+        <text class="t-sans" x="290" y="492" text-anchor="middle" font-size="14" fill="var(--ink-muted)">#4</text>
+        <text class="t-sans" x="430" y="462" text-anchor="middle" font-size="14" fill="var(--ink-muted)">#3</text>
+        <text class="t-sans" x="570" y="412" text-anchor="middle" font-size="14" fill="var(--ink-muted)">#2</text>
+        <text class="t-sans" x="710" y="362" text-anchor="middle" font-size="14" fill="var(--ink-muted)">#1</text>
+      </g>
+      <g class="fx" data-out="5" style="--d:1.2s">
+        <g transform="translate(710 320)"><use href="#robot" transform="scale(.9)"/></g>
+      </g>
+      <!-- score cards above each -->
+      <g class="fx" data-out="5" style="--d:1.6s">
+        <g transform="translate(250 290)"><rect width="80" height="44" rx="8" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.3"/>
+          <rect x="10" y="12" width="60" height="6" rx="3" fill="var(--bg-wash)"/><rect class="bar" style="--d:2s" x="10" y="12" width="22" height="6" rx="3" fill="var(--amber)"/>
+          <rect x="10" y="26" width="60" height="6" rx="3" fill="var(--bg-wash)"/><rect class="bar" style="--d:2.1s" x="10" y="26" width="30" height="6" rx="3" fill="var(--amber)"/></g>
+        <g transform="translate(390 240)"><rect width="80" height="44" rx="8" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.3"/>
+          <rect x="10" y="12" width="60" height="6" rx="3" fill="var(--bg-wash)"/><rect class="bar" style="--d:2.2s" x="10" y="12" width="36" height="6" rx="3" fill="var(--amber)"/>
+          <rect x="10" y="26" width="60" height="6" rx="3" fill="var(--bg-wash)"/><rect class="bar" style="--d:2.3s" x="10" y="26" width="40" height="6" rx="3" fill="var(--amber)"/></g>
+        <g transform="translate(530 190)"><rect width="80" height="44" rx="8" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.3"/>
+          <rect x="10" y="12" width="60" height="6" rx="3" fill="var(--bg-wash)"/><rect class="bar" style="--d:2.4s" x="10" y="12" width="48" height="6" rx="3" fill="var(--amber)"/>
+          <rect x="10" y="26" width="60" height="6" rx="3" fill="var(--bg-wash)"/><rect class="bar" style="--d:2.5s" x="10" y="26" width="50" height="6" rx="3" fill="var(--amber)"/></g>
+        <g transform="translate(670 130)"><rect width="80" height="44" rx="8" fill="#FFFDF9" stroke="var(--slate)" stroke-width="1.3"/>
+          <rect class="bar" style="--d:2.6s;--t:.6s" x="10" y="12" width="60" height="6" rx="3" fill="var(--slate)"/>
+          <rect class="bar" style="--d:2.7s;--t:.6s" x="10" y="26" width="60" height="6" rx="3" fill="var(--slate)"/></g>
+      </g>
+      <g class="fx" data-out="5" style="--d:3.4s">
+        <g transform="translate(500 110)"><text class="wobble fb t-serif" font-size="64" fill="var(--ink-muted)" text-anchor="middle">?</text></g>
+      </g>
+      <!-- the people: on the stairs, then on the same ground -->
+      <g class="down down1" data-on="5">
+        <g class="fx" style="--d:.6s">
+          <g class="swapOut" data-at="5"><g transform="translate(290 470)"><use href="#fig-droop"/></g>
+            <path class="drip" d="M286 378 C283 384 283 388 286 389 C289 388 289 384 286 378 Z" fill="var(--slate-wash)" stroke="var(--slate)" stroke-width="1.2"/></g>
+          <g class="swapIn" data-at="5"><g transform="translate(290 470)"><use href="#fig-stand"/></g></g>
+        </g>
+      </g>
+      <g class="down down2" data-on="5"><g class="fx" style="--d:.8s"><g transform="translate(430 420)"><use href="#fig-stand"/></g></g></g>
+      <g class="down down3" data-on="5"><g class="fx" style="--d:1s"><g transform="translate(570 370) scale(-1 1)"><use href="#fig-stand"/></g></g></g>
+
+      <!-- B5: what can't be put on a card -->
+      <g data-at="5">
+        <path class="draw mut" pathLength="1" style="--d:1.4s" d="M150 460 H850"/>
+        <!-- 1 · a child's hand -->
+        <g class="fx" style="--d:2.2s">
+          <circle cx="300" cy="400" r="62" fill="var(--terra-wash)" opacity=".8"/>
+          <g transform="translate(330 460) scale(.62) scale(-1 1)"><use href="#fig-stand"/></g>
+          <path class="ink" d="M298 404 C306 414 314 422 322 430" stroke-width="1.5"/>
+          <g transform="translate(312 332)"><use class="beat fb" href="#heart" fill="var(--terra-wash)" stroke="var(--terra)" stroke-width="1.4"/></g>
+        </g>
+        <!-- 2 · music -->
+        <g class="fx" style="--d:2.8s">
+          <circle cx="440" cy="400" r="62" fill="var(--amber-wash)" opacity=".8"/>
+          <g class="bob"><path class="ink" d="M470 330 V300 L490 296 V324" stroke-width="1.8"/>
+            <ellipse cx="465" cy="332" rx="6" ry="4.5" fill="var(--ink)" transform="rotate(-20 465 332)"/><ellipse cx="485" cy="326" rx="6" ry="4.5" fill="var(--ink)" transform="rotate(-20 485 326)"/></g>
+        </g>
+        <!-- 3 · tending a flower -->
+        <g class="fx" style="--d:3.4s">
+          <circle cx="580" cy="400" r="62" fill="var(--sage-wash)" opacity=".9"/>
+          <path class="sg" d="M538 460 C536 440 540 428 538 414" stroke-width="2"/>
+          <g transform="translate(538 408)"><circle cy="-7" r="6" fill="var(--terra-wash)" stroke="var(--terra)" stroke-width="1.2"/><circle cx="7" cy="0" r="6" fill="var(--terra-wash)" stroke="var(--terra)" stroke-width="1.2"/><circle cx="-7" cy="0" r="6" fill="var(--terra-wash)" stroke="var(--terra)" stroke-width="1.2"/><circle cy="6" r="6" fill="var(--terra-wash)" stroke="var(--terra)" stroke-width="1.2"/><circle r="3.5" fill="var(--amber)"/></g>
+          
+        </g>
+        <!-- 4 · someone new, just sitting with tea at dusk -->
+        <g class="fx" style="--d:4s">
+          <circle cx="730" cy="400" r="62" fill="var(--slate-wash)" opacity=".8"/>
+          <g transform="translate(722 460)"><use href="#fig-stand"/></g>
+          <path class="ink" d="M738 384 H756 C756 396 750 402 747 402 C744 402 738 396 738 384 Z" fill="#FFFDF9" stroke-width="1.5"/>
+          <g class="steam"><path class="am" d="M744 376 C740 370 748 366 744 358 M752 376 C748 370 756 366 752 358" stroke-width="1.4"/></g>
+        </g>
+        <text class="fx t-serif" style="--d:5s" x="500" y="150" text-anchor="middle" font-size="30">什么才算更好的一个人？</text>
+      </g>
+    </g>
+
+    <!-- ===== B6 · 结尾：如何自处？ ===== -->
+    <g class="fx" data-at="6" style="--ft:2s;--y:0px">
+      <rect x="-300" y="-100" width="1600" height="760" fill="#FAF6EF"/>
+      <circle cx="500" cy="300" r="250" fill="rgba(224,169,109,.20)" filter="url(#softBlur)" class="breathe fb"/>
+      <circle cx="500" cy="300" r="150" fill="rgba(217,107,82,.10)" filter="url(#softBlur)"/>
+      <path class="draw mut" pathLength="1" style="--d:.6s;--t:2.4s" d="M-100 420 C120 392 300 408 470 400 S800 380 1100 404" stroke-width="1.6"/>
+      <path class="draw mut" pathLength="1" style="--d:1s;--t:2.4s" d="M-100 448 C160 432 360 446 560 438 S860 426 1100 444" stroke-width="1.2" opacity=".55"/>
+      <g class="fx" style="--d:1.6s" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="742" cy="350" r="8.5" fill="#FFFDF9"/>
+        <path d="M741 359 C739 370 739 380 742 388 L760 388 L764 398"/>
+        <path d="M741 366 L754 378"/>
+      </g>
+      <g class="drift" fill="none" stroke="var(--ink-muted)" stroke-width="1.6" stroke-linecap="round">
+        <path d="M200 170 q6 -6 12 0 q6 -6 12 0"/><path d="M236 190 q5 -5 10 0 q5 -5 10 0"/>
+      </g>
+      <g fill="var(--amber)" opacity=".6">
+        <circle class="float" cx="180" cy="420" r="2.4"/><circle class="float" style="animation-delay:-3s" cx="420" cy="440" r="2"/>
+        <circle class="float" style="animation-delay:-5s" cx="640" cy="430" r="2.4"/><circle class="float" style="animation-delay:-7s" cx="860" cy="440" r="2"/>
+      </g>
+    </g>
+  </svg>
+  </div>
+  <div class="end-title" data-at="6"><h1>如何自处？</h1><span class="rule"></span></div>
+</section>
+
+<div class="progress" id="progress"></div>
+<div class="cue" id="cue"></div>
+
+<script>
+(function () {
+  const NS = 'http://www.w3.org/2000/svg';
+  const pages = [...document.querySelectorAll('.page')];
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* generated: AI output pile */
+  document.querySelectorAll('.pile').forEach(g => {
+    const o = g.dataset;
+    for (let i = 0; i < +o.n; i++) {
+      const r = document.createElementNS(NS, 'rect');
+      Object.entries({ x: +o.x + (i % 3 - 1) * 2, y: +o.y - (i + 1) * 10, width: 40, height: 8, rx: 2, fill: '#FFFDF9', stroke: '#8C8277', 'stroke-width': 1.2 })
+        .forEach(([k, v]) => r.setAttribute(k, v));
+      r.setAttribute('class', 'fx');
+      r.style.setProperty('--d', (+o.d0 + i * +o.step) + 's');
+      g.appendChild(r);
+    }
+  });
+
+  /* beat ownership */
+  document.querySelectorAll('.fx, .draw, .bar').forEach(el => {
+    if (!el.dataset.at) {
+      const owner = el.parentElement.closest('[data-at]');
+      el.dataset.at = owner ? owner.dataset.at : '1';
+    }
+  });
+
+  /* timeline playhead (page 1) */
+  const playhead = document.getElementById('playhead');
+  const tlLabels = [...document.querySelectorAll('.tl-label')];
+  const stageOf = b => b <= 3 ? -1 : b <= 8 ? b - 4 : 5;
+  function setTimeline(b, stepForward) {
+    const s = stageOf(b);
+    tlLabels.forEach(l => l.classList.toggle('cur', +l.dataset.stage === s));
+    const x = s < 0 ? 0 : s * 150;
+    if (b === 3 && stepForward && !reduced) {
+      playhead.style.transition = 'none';
+      playhead.style.transform = 'translateX(750px)';
+      void playhead.getBoundingClientRect();
+      playhead.style.transition = 'transform 2.8s cubic-bezier(.6,0,.3,1) 1s';
+      playhead.style.transform = 'translateX(0px)';
+    } else {
+      playhead.style.transition = '';
+      playhead.style.transform = `translateX(${x}px)`;
+    }
+  }
+
+  const cues = [
+    ['标题 · 如何自处？', 'AI 三秒交卷，我心里打鼓', '倒带：回到六亿年前',
+     '① 同一团气味，饿时是 +，饱时是 −', '② 灯一亮就“想要”，吃到时只是“喜欢”', '③ 先在脑中的另一个世界里试一遍',
+     '④ 我想象的你，长着我的脸', '⑤ 语言传递世界，也把人压成一个词', '这一切长在同一个活的身体上'],
+    ['伽利略：一只苹果，两种性质', '四百年：只量得出来的一路狂飙', '一切都有了分数，连人也是', '排行榜：谁是更好的人？',
+     '台阶消失：什么才算更好的一个人？', '如何自处？']
+  ];
+
+  let P = 0, B = 1;
+  function apply(stepForward) {
+    pages.forEach((pg, i) => {
+      const active = i === P;
+      pg.classList.toggle('active', active);
+      pg.setAttribute('aria-hidden', String(!active));
+    });
+    const page = pages[P];
+    page.querySelectorAll('[data-at]').forEach(el => el.classList.toggle('in', B >= +el.dataset.at));
+    page.querySelectorAll('[data-on]').forEach(el => el.classList.toggle('in', B >= +el.dataset.on));
+    page.querySelectorAll('[data-out]').forEach(el => el.classList.toggle('out', B >= +el.dataset.out));
+    if (P === 0) setTimeline(B, stepForward);
+    const total = pages.reduce((s, p) => s + +p.dataset.beats, 0);
+    const done = pages.slice(0, P).reduce((s, p) => s + +p.dataset.beats, 0) + B;
+    document.getElementById('progress').style.width = (done / total * 100) + '%';
+    document.getElementById('cue').textContent = `${P + 1}.${B}  ${cues[P][B - 1]}`;
+    history.replaceState(null, '', `#${P + 1}-${B}`);
+  }
+  function next() {
+    if (B < +pages[P].dataset.beats) B++;
+    else if (P < pages.length - 1) { P++; B = 1; }
+    else return;
+    apply(true);
+  }
+  function prev() {
+    if (B > 1) B--;
+    else if (P > 0) { P--; B = +pages[P].dataset.beats; }
+    else return;
+    apply(false);
+  }
+  window.addEventListener('keydown', e => {
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { P = 0; B = 1; apply(false); }
+    else if (e.key === 'End') { P = pages.length - 1; B = +pages[P].dataset.beats; apply(false); }
+    else if (e.key === 'n' || e.key === 'N') document.body.classList.toggle('show-cue');
+    else if (e.key === 'f' || e.key === 'F') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
+  });
+  document.addEventListener('click', e => { if (e.button === 0) next(); });
+  document.addEventListener('contextmenu', e => { e.preventDefault(); prev(); });
+  let tx = null;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+  function readHash() {
+    const m = location.hash.match(/^#(\d+)-(\d+)$/);
+    if (!m) return false;
+    P = Math.min(Math.max(+m[1] - 1, 0), pages.length - 1);
+    B = Math.min(Math.max(+m[2], 1), +pages[P].dataset.beats);
+    return true;
+  }
+  window.addEventListener('hashchange', () => { if (readHash()) apply(false); });
+  readHash();
+  apply(false);
+})();
+</script>
+</body>
+</html>
