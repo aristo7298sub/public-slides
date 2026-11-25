@@ -944,6 +944,12 @@ body.show-cue .cue{opacity:1}
     document.getElementById('progress').style.width = (done / total * 100) + '%';
     document.getElementById('cue').textContent = `${P + 1}.${B}  ${cues[P][B - 1]}`;
     history.replaceState(null, '', `#${P + 1}-${B}`);
+    if (reduced) {
+      void page.getBoundingClientRect();
+      document.getAnimations().forEach(animation => {
+        try { animation.finish(); } catch (_) { /* animation has no finite end */ }
+      });
+    }
   }
   function next() {
     if (B < +pages[P].dataset.beats) B++;
